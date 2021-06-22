@@ -7,13 +7,7 @@ public class Main {
         FileService fileService = new FileService();
         Count count1 = new Count(string, fileService);
         count1.start();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         Count count2 = new Count(string, fileService);
-
         count2.start();
     }
 }

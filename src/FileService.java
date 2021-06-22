@@ -45,6 +45,11 @@ public class FileService {
             if (!lengths.isEmpty()) {
                 for (long l : lengths) {
                     System.out.println(l);
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 lengths.clear();
                 notifyAll();
