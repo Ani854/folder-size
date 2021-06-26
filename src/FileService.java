@@ -1,64 +1,38 @@
 import java.io.File;
-import java.util.LinkedHashSet;
 
 public class FileService {
-    public static LinkedHashSet<Long> lengths = new LinkedHashSet<>();
-    volatile boolean isFinished = false;
-    volatile boolean isActiveCalculator = false;
-    volatile boolean isActivePrinter = false;
+    public static long size = 0;
 
-    public synchronized void folderSizeCalculator(File directory) {
-        if (!isActiveCalculator) {
-            isActiveCalculator = true;
+    public void folderSizeCalculator(File directory, boolean isCalculate, boolean isPrint) {
+        if (isCalculate) {
             folderSize(directory);
-            isFinished = true;
         }
-        if (!isActivePrinter) {
-            isActivePrinter = true;
+        if (isPrint) {
             print();
         }
     }
 
-    public synchronized long folderSize(File directory) {
-        long len = 0;
+    public void folderSize(File directory) {
         for (File file : directory.listFiles()) {
             if (file.isFile()) {
-                len += file.length();
-                lengths.add(len);
-                notifyAll();
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                size += file.length();
             } else {
-                len += folderSize(file);
+                folderSize(file);
             }
         }
-        notify();
-        return len;
-
     }
 
-    public synchronized void print() {
-        while (!isFinished) {
-            if (!lengths.isEmpty()) {
-                for (long l : lengths) {
-                    System.out.println(l);
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                lengths.clear();
-                notifyAll();
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    public void print() {
+        long oldValue = 0;
+        try {
+            Thread.sleep(100);
+            while (oldValue != size) {
+                System.out.println(size);
+                oldValue = size;
+                Thread.sleep(1000);
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
